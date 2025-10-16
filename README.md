@@ -1,7 +1,7 @@
 # swagx-destop
 an OS-type thing in batch/vbs.
 
-#licencing
+# licencing
 you can copy and renforce. 
 
 # : )
