@@ -1,5 +1,5 @@
 # swagx-destop
-an OS-type thing in batch/vbs.
+Tool made in hta, desktop html.
 
 # licencing
 you can copy and renforce. 
