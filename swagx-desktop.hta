@@ -1,1 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<title>setup wizard</title>
+<HTA:APPLICATION
+    ID="oHTA"
+    APPLICATIONNAME="setup wizard"
+    BORDER="dialog"
+    BORDERSTYLE="normal"
+    CAPTION="yes"
+    MAXIMIZEBUTTON="no"
+    MINIMIZEBUTTON="no"
+    SYSMENU="yes"
+    SCROLL="no"
+    SINGLEINSTANCE="yes"
+    WINDOWSTATE="normal"
+/>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background: #d9d9d9;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: "Segoe UI", sans-serif;
+    color: #222;
+}
+.container {
+    display: flex;
+    flex-direction: row;
+    width: 1000px;
+    height: 850px;
+    background: #fff;
+    border: 1px solid #aaa;
+}
+.wizard-panel {
+    flex: 0 0 280px;
+    background: #445d89;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-right: 1px solid #999;
+}
+.wizard-panel img {
+    width: 85%;
+    height: auto;
+    object-fit: contain;
+}
+.content-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px;
+    background: #ffffff;
+}
+.step-content {
+    flex: 1;
+}
+.hidden {
+    display: none;
+}
+h1, h2 {
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    color: #111;
+}
+p, label {
+    font-size: 14px;
+    line-height: 1.5;
+}
+input, select, textarea {
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+button {
+    background: #0078d7;
+    color: #fff;
+    border: 1px solid #005ea5;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #005ea5;
+}
+button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+.program-window {
+    display: none;
+    width: 600px;
+    height: 400px;
+    background: #fff;
+    border: 1px solid #999;
+    padding: 20px;
+    flex-direction: column;
+}
+.program-window h2 {
+    margin-bottom: 15px;
+}
+.program-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.program-box:hover {
+    background: #f0f0f0;
+}
+</style>
+</head>
+<body onload="resizeTo(1000,850); moveTo((screen.width-1000)/2, (screen.height-850)/2); loadWizardImage();">
+<div class="container" id="wizardContainer">
+    <div class="wizard-panel">
+        <img id="wizardImg" src="" alt="wizard">
+    </div>
+    <div class="content-panel">
+        <div id="step1" class="step-content">
+            <h2>wsup welcome to the setup wizard</h2>
+            <p>this will guide you through the installation process</p>
+            <p>yes.</p>
+        </div>
+        <div id="step2" class="step-content hidden">
+            <h2>enter your name:</h2>
+            <p>this will personalize your installation.</p>
+            <input type="text" id="userName" value="">
+        </div>
+        <div id="step3" class="step-content hidden">
+            <h2>choose installation directory:</h2>
+            <p>default: c:\program files\swagx-desktop</p>
+            <input type="text" id="installPath" value="c:\program files\swagx-desktop">
+        </div>
+        <div id="step4" class="step-content hidden">
+            <h2>wanna create a desktop shortcut?</h2>
+            <label class="checkbox-label">
+                <input type="checkbox" id="createShortcut" checked>
+                <span>create desktop shortcut</span>
+            </label>
+        </div>
+        <div id="step5" class="step-content hidden">
+            <h2>please confirm your installation settings:</h2>
+            <p id="confirmDetails"></p>
+            <p>click ok to begin installation or cancel to abort.</p>
+        </div>
+        <div id="step6" class="step-content hidden">
+            <h2>installing... please wait.</h2>
+            <p>installing files to your system...</p>
+        </div>
+        <div id="step7" class="step-content hidden">
+            <h2>installation completed successfully!</h2>
+            <p id="completeDetails"></p>
+        </div>
+        <div class="buttons">
+            <button id="cancelBtn" onclick="cancelSetup()">cancel</button>
+            <button id="nextBtn" class="primary" onclick="nextStep()">ok</button>
+        </div>
+    </div>
+</div>
 
+<div class="program-window" id="programWindow">
+    <h2>SwagX Program</h2>
+    <div class="program-box" onclick="openPinger()">
+        <span>1: Website/IP Pinger</span>
+        <span>→</span>
+    </div>
+    <div class="program-box">
+        <span>2: TBD</span>
+        <span>→</span>
+    </div>
+</div>
+
+<script>
+var currentStep = 1;
+var userData = { userName: "", installPath: "c:\\program files\\swagx-desktop", createShortcut: true };
+function loadWizardImage() {
+    document.getElementById("wizardImg").src = "https://th.bing.com/th/id/R.386c368663d0b506a8dbde00c8a5a5eb?rik=d9rBr8Lx0E4HPg&riu=http%3a%2f%2fclipart-library.com%2fdata_images%2f474914.png&ehk=tUaeu%2b81F5%2f1CDHzQV0TevyAYjox%2bazbrQ%2bLwuUZv7E%3d&risl=1&pid=ImgRaw&r=0";
+    var shell = new ActiveXObject("WScript.Shell");
+    var userName = shell.ExpandEnvironmentStrings("%USERNAME%");
+    document.getElementById("userName").value = userName;
+}
+function nextStep() {
+    if (currentStep === 1) { showStep(2); currentStep=2; }
+    else if (currentStep === 2) { userData.userName=document.getElementById("userName").value; if(userData.userName===""){alert("setup cancelled. user name is required.");return;} showStep(3); currentStep=3; }
+    else if (currentStep === 3) { userData.installPath=document.getElementById("installPath").value; if(userData.installPath===""){alert("setup cancelled. installation path is required.");return;} showStep(4); currentStep=4; }
+    else if (currentStep === 4) { userData.createShortcut=document.getElementById("createShortcut").checked; var confirmDetails="user name: "+userData.userName+"\ninstallation path: "+userData.installPath+"\ndesktop shortcut: "+(userData.createShortcut?"yes":"no"); document.getElementById("confirmDetails").innerText=confirmDetails; showStep(5); currentStep=5; }
+    else if (currentStep === 5) { showStep(6); currentStep=6; document.getElementById("nextBtn").disabled=true; document.getElementById("cancelBtn").disabled=true; setTimeout(performInstallation,1500); }
+    else if (currentStep === 7) { window.close(); }
+}
+function showStep(stepNum) { for(var i=1;i<=7;i++){ var el=document.getElementById("step"+i); if(el){el.className=i===stepNum?"step-content":"step-content hidden";} } if(stepNum===7){ document.getElementById("nextBtn").innerText="finish"; document.getElementById("cancelBtn").style.display="none"; } }
+function performInstallation() {
+    try{
+        var fso=new ActiveXObject("Scripting.FileSystemObject");
+        var shell=new ActiveXObject("WScript.Shell");
+        if(!fso.FolderExists(userData.installPath)){fso.CreateFolder(userData.installPath);}
+        var configFile=fso.CreateTextFile(userData.installPath+"\\config.ini",true);
+        configFile.WriteLine("[settings]");
+        configFile.WriteLine("username="+userData.userName);
+        configFile.WriteLine("installdate="+new Date().toString());
+        configFile.Close();
+        if(userData.createShortcut){ var desktopPath=shell.SpecialFolders("Desktop"); var shortcut=shell.CreateShortcut(desktopPath+"\\swagx-desktop.lnk"); shortcut.TargetPath=userData.installPath; shortcut.Description="swagx-desktop - installed for "+userData.userName; shortcut.Save(); }
+        var completeDetails="thank you, "+userData.userName+"!\n\nfiles have been installed to:\n"+userData.installPath;
+        document.getElementById("completeDetails").innerText=completeDetails;
+        showStep(7);
+        currentStep=7;
+        document.getElementById("nextBtn").disabled=false;
+        document.getElementById("cancelBtn").disabled=false;
+        openProgramWindow();
+    }catch(e){alert("error creating installation directory: "+e.message); window.close();}
+}
+function cancelSetup(){ if(confirm("are you sure you want to cancel the setup?")){window.close();} }
+function openProgramWindow(){
+    document.getElementById("wizardContainer").style.display="none";
+    var win=document.getElementById("programWindow");
+    win.style.display="flex";
+    resizeTo(620,450);
+    moveTo((screen.width-620)/2,(screen.height-450)/2);
+}
+function openPinger(){
+    var shell=new ActiveXObject("WScript.Shell");
+    shell.Run("https://your-pinger-page-url.com");
+}
+</script>
+</body>
+</html>
